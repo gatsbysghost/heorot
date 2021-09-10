@@ -3,7 +3,7 @@ name = "heorot"
 description = "A very simple Rust-based OS"
 version = "0.1.0"
 edition = "2018"
-authors = "Scott Reu"
+authors = ["Scott Reu"]
 license = "MIT"
 license_file = "LICENSE.txt"
 
