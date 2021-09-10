@@ -1,3 +1,5 @@
+use volatile::Volatile;
+
 /// Static values for colors in a C-style struct
 #[allow(dead_code)] // Don't throw compiler errors for unused items
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,7 +48,7 @@ const BUFFER_WIDTH: usize = 80;
 /// New Buffer type (for the text buffer)
 #[repr(transparent)]
 struct Buffer {
-    chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 /// New Writer type, this writes to the screen.
@@ -71,10 +73,10 @@ impl Writer {
 
                 let color_code = self.color_code;
                 // Write a new ScreenChar at the current position
-                self.buffer.chars[row][col] = ScreenChar {
+                self.buffer.chars[row][col].write(ScreenChar {
                     ascii_character: byte,
                     color_code,
-                };
+                });
                 self.column_position += 1;
             }
         }
