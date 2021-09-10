@@ -22,3 +22,8 @@ fn test_runner(tests: &[&dyn Fn()]) {
 fn panic(info: &PanicInfo) -> ! {
     heorot::test_panic_handler(info)
 }
+
+#[test_case]
+fn test_println() {
+    println!("test_println output");
+}
