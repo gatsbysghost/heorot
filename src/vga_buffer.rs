@@ -1,5 +1,6 @@
 use volatile::Volatile;
 use core::fmt;
+use lazy_static::lazy_static;
 
 /// Static values for colors in a C-style struct
 #[allow(dead_code)] // Don't throw compiler errors for unused items
@@ -83,11 +84,27 @@ impl Writer {
         }
     }
 
-    fn new_line(&mut self) {/* TODO */}
-}
+    fn new_line(&mut self) {
+        for row in 1..BUFFER_HEIGHT {
+            for col in 0..BUFFER_WIDTH {
+              let character = self.buffer.chars[row][col].read();
+              self.buffer.chars[row - 1][col].write(character);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1);
+        self.column_position = 0;
+    }
 
-/// Function to write a string
-impl Writer {
+    fn clear_row(&mut self, row: usize) {
+        let blank = ScreenChar {
+            ascii_character: b' ',
+            color_code: self.color_code,
+        };
+        for col in 0..BUFFER_WIDTH {
+            self.buffer.chars[row][col].write(blank);
+        }
+    }
+
     pub fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
             match byte {
@@ -99,6 +116,22 @@ impl Writer {
 
         }
     }
+}
+
+/// Add support for Rust's core write methods & formatting macros
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+      self.write_string(s);
+      Ok(())
+    }
+}
+
+lazy_static! {
+    pub static ref WRITER: Writer = Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Green, Color::Black),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    };
 }
 
 /// Test function to print a Hello World! (remove later)
@@ -114,12 +147,4 @@ pub fn print_something() {
     writer.write_string("ello ");
     writer.write_string("World!");
     write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
-}
-
-/// Add support for Rust's core write methods & formatting macros
-impl fmt::Write for Writer {
-  fn write_str(&mut self, s: &str) -> fmt::Result {
-    self.write_string(s);
-    Ok(())
-  }
 }
