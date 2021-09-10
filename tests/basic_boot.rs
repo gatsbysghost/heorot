@@ -7,28 +7,23 @@
 use core::panic::PanicInfo;
 use heorot::println;
 
-// static HELLO: &[u8] = b"Hello World!";
-
-#[no_mangle]
+#[no_mangle] // don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
-    println!("Hello world{}", "!");
-
-    #[cfg(test)]
     test_main();
+
     loop {}
 }
 
-/// This gets called in the event of a panic
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    println!("{}", _info);
-    loop {}
+fn test_runner(tests: &[&dyn Fn()]) {
+    unimplemented!();
 }
 
-/// This is the panic handler we call when we're testing
-#[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     heorot::test_panic_handler(info)
+}
+
+#[test_case]
+fn test_println() {
+    println!("test_println output");
 }
