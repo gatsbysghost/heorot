@@ -13,8 +13,21 @@ use heorot::println;
 pub extern "C" fn _start() -> ! {
     println!("Hello world{}", "!");
 
+    heorot::init();
+
+    fn stack_overflow() {
+        stack_overflow(); // for each recursion, the return address is pushed
+    }
+
+    // trigger a stack overflow
+    stack_overflow();
+
+    x86_64::instructions::interrupts::int3();
+
     #[cfg(test)]
     test_main();
+
+    println!("It did not crash!");
     loop {}
 }
 
