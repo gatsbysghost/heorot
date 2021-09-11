@@ -19,7 +19,7 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("It did not crash!");
-    loop {}
+    heorot::hlt_loop();
 }
 
 /// This gets called in the event of a panic
@@ -27,7 +27,7 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     println!("{}", _info);
-    loop {}
+    heorot::hlt_loop();
 }
 
 /// This is the panic handler we call when we're testing
