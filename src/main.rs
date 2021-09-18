@@ -15,9 +15,6 @@ pub extern "C" fn _start() -> ! {
 
     heorot::init();
 
-    let ptr = 0xdeadbeaf as *mut u32;
-    unsafe { *ptr = 42; }
-
     #[cfg(test)]
     test_main();
 
